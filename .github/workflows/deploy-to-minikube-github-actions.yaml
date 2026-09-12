@@ -23,6 +23,13 @@ jobs:
     - name: Deploy to minikube
       run:
         kubectl apply -f k8s-node-app.yaml
+    - name: Wait for pod to be ready
+      run: kubectl wait --for=condition=Ready pod -l app=nodejs-app --timeout=90s
+        - name: Debug pod status
+      run: |
+          kubectl get pods -o wide
+          kubectl describe pods -l app=nodejs-app
+          kubectl logs -l app=nodejs-app --all-containers --tail=100 || true
     - name: Test service URLs
       run: |
           minikube service list
